@@ -92,6 +92,20 @@ class Util{
     public int get_cantDmg(){
     return _cantDmg;
     }
+
+    public void comprar_Producto(int cantidad){
+        _cant += cantidad;
+
+    }
+
+    public void vender_Producto(int cantidad){
+        _cant -= cantidad;
+
+    }
+}
+
+class Compra{
+
 }
 
 /*
@@ -121,16 +135,34 @@ class UtilesOficina{
     private static int CANT_PROVEE = 2;
     private static int CANT_UTILES = 2;
 
+    private static int MAX_DIAS = 5;
+
     private Proveedor [] _arrProveedores = new Proveedor [CANT_PROVEE];
 
     private Util[] _arrUtiles = new Util[CANT_UTILES];
 
+    ArrayList<ArrayList<Integer>> _matCompras = new ArrayList<>(MAX_DIAS);
+    ArrayList<ArrayList<Integer>> _matVentas = new ArrayList<>(MAX_DIAS);
     
 
     public UtilesOficina(){
         this.set_arrProveedores();
         this.set_arrUtiles();
+        this.set_matCompras();
+        this.set_matVentas();
 
+    }
+
+    private void set_matCompras(){
+        for(int i=0; i < MAX_DIAS;i++) {
+            _matCompras.add(new ArrayList());
+        }
+    }
+
+    private void set_matVentas(){
+        for(int i=0; i < MAX_DIAS;i++) {
+            _matVentas.add(new ArrayList());
+        }
     }
     
     
@@ -172,7 +204,7 @@ class UtilesOficina{
                 cantidad = sc.nextInt();
 
 
-                System.out.println("Hubo algun articulo dañado?\n 1) Si 2) No");
+                System.out.println("Hay algun articulo dañado?\n 1) Si 2) No");
                 isDmg = sc.nextInt();
                 
 
@@ -303,6 +335,74 @@ class UtilesOficina{
             }
         }
     }
+
+
+    public int isDmg(int cantidad){
+        int isDmg;
+        int cantDmg;
+        System.out.println("Hay algun articulo dañado?\n 1) Si 2) No");
+        isDmg = sc.nextInt();                
+        if(isDmg == 1){
+            do{
+            System.out.println("Cuantos utiles dañados hubo? ");
+            cantDmg = sc.nextInt();
+            cantidad = cantidad - cantDmg;
+            }while(cantDmg > cantidad);
+        }
+
+        return cantidad;
+    }
+
+    public void comprar_Util(int idProducto, int cantCompra){
+        cantCompra = isDmg(cantCompra);
+        _arrUtiles[idProducto-1].comprar_Producto(cantCompra);        
+        _matCompras.get(idProducto-1).add(cantCompra);
+    }
+
+
+    public void vender_Util(int idProducto, int cantVenta){
+        if(_arrUtiles[idProducto-1].get_Cantidad() < cantVenta){
+            System.out.println("La cantidad a comprar supera el stock actual");
+        }
+        else{
+        _arrUtiles[idProducto-1].vender_Producto(cantVenta);
+        _matCompras.get(idProducto-1).add(cantVenta);
+        }
+    }
+
+    public void imprimirVenta(){
+        int cantidadTotal = 0;
+        for (int i = 0; i < CANT_UTILES;i++) {
+            int edgeCount = _matVentas.get(i).size();
+            cantidadTotal = 0;
+            for (int j = 0; j < edgeCount; j++) {
+
+                System.out.printf("Ventas de %s\n",_arrUtiles[i].get_Nombre());
+                System.out.printf("Venta[%d]: %f\n",j+1,_matVentas.get(i).get(j));
+                cantidadTotal += _matVentas.get(i).get(j); 
+            }
+            System.out.printf("Total %d\n",cantidadTotal);
+            
+        }
+    }
+
+    public void imprimirCompra(){
+        int cantidadTotal = 0;
+        for (int i = 0; i < CANT_UTILES;i++) {
+            int edgeCount = _matCompras.get(i).size();
+            cantidadTotal = 0;
+            for (int j = 0; j < edgeCount; j++) {
+
+                System.out.printf("Compras de %s\n",_arrUtiles[i].get_Nombre());
+                System.out.printf("Compra[%d]: %f\n",j+1,_matCompras.get(i).get(j));
+                cantidadTotal += _matCompras.get(i).get(j); 
+            }
+            System.out.printf("Total %d\n",cantidadTotal);
+            
+        }
+    }
+
+    
 
 
 

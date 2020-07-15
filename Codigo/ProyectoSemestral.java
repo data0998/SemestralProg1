@@ -88,6 +88,10 @@ class Util{
     public int get_IsDmg(){
         return _isDmg; 
     }
+
+    public int get_cantDmg(){
+    return _cantDmg;
+    }
 }
 
 /*
@@ -252,7 +256,7 @@ class UtilesOficina{
 
         for(int i = 0; i< CANT_UTILES;i++){
             if(_arrUtiles[i].get_IsDmg() == 1){
-                System.out.printf("\nEl util %s tiene algunos dañados :c", _arrUtiles[i].get_Nombre());
+                System.out.printf("\nEl util %s tiene %d dañados :c", _arrUtiles[i].get_Nombre(),_arrUtiles[i].get_cantDmg());
             }
         }
     }

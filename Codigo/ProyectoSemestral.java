@@ -39,18 +39,25 @@ class Util{
 
     private String _proveedor;
     private String _nombre;
-    private int _codigo;
+    /*private int _codigo;*/
     private int _restock;
     private int _cant;
     private Date _fecha;
+
+    private int _cantVen = 0;
+
+    private int _cantDmg;
+    private int _isDmg;
     
 
-    public Util( String nombre, String proveedor, /*int codigo*/ int restock, int cantidad,Date fecha){
+    public Util( String nombre, String proveedor, /*int codigo*/ int restock, int cantidad,Date fecha, int isDmg, int cantDmg){
         this._nombre = nombre;
         this._proveedor = proveedor;
         this._restock = restock;
         this._cant = cantidad;
         this._fecha = fecha;
+        this._isDmg = isDmg;
+        this._cantDmg = cantDmg;
     }
 
     public String get_Nombre() {
@@ -71,6 +78,15 @@ class Util{
 
         public Date get_Fecha(){
         return _fecha;
+    }
+
+    /* Si es 1 hay articulos dañados, si es 0 no hay articulos dañaos, de lo contrario 2*/
+    public void set_IsDmg(String s_isDmg){
+        _isDmg = s_isDmg.equals("S")? 1: s_isDmg.equals("N")?2:0; 
+    }
+
+    public int get_IsDmg(){
+        return _isDmg; 
     }
 }
 
@@ -105,6 +121,8 @@ class UtilesOficina{
 
     private Util[] _arrUtiles = new Util[CANT_UTILES];
 
+    
+
     public UtilesOficina(){
         this.set_arrProveedores();
         this.set_arrUtiles();
@@ -122,33 +140,51 @@ class UtilesOficina{
             int tipo;
             Date fecha;
 
-            for(int i = 0; i< CANT_UTILES;i++){
-                System.out.println("Ingrese los siguientes datos de su util" + (i+1));
+            int isDmg;
+            int cantDmg = 0;
 
-                System.out.println("Tipo de articulo:\n1) No Perecedero\n2) Perecedero");
+            for(int i = 0; i< CANT_UTILES;i++){
+                System.out.printf("Ingrese los siguientes datos del util [%d]",  (i+1));
+
+                System.out.println("Seleccione el tipo de util:\n1) No Perecedero\n2) Perecedero");
                 tipo = sc.nextInt();
                 sc.nextLine();
 
-                System.out.println("Ingrese el nombre:");
+                System.out.println("Ingrese el nombre del util:");
                 nombre = sc.nextLine();
 
-                System.out.println("Id del Proveedor");
+                System.out.println("Ingrese el numero de proveedor: ");
                 ImprimirProveedores();
+                System.out.printf("Num. Proveedor: ");
                 idProveedor = sc.nextInt();
 
                 /*System.out.println("Ingrese el Codigo del Producto:");
                 codigo = sc.nextInt();*/
 
-                System.out.println("Establezca un punto de reorden para " + nombre + ":");
+                System.out.println("Ingrese el punto de reorden para " + nombre + ":");
                 restock = sc.nextInt();
 
-                System.out.println("Cantidad de " + nombre + " que existen hasta el momento: ");
+                System.out.println("Ingrese la cantidad de " + nombre + " que existen hasta el momento: ");
                 cantidad = sc.nextInt();
+
+
+                System.out.println("Hubo algun articulo dañado?\n 1) Si 2) No");
+                isDmg = sc.nextInt();
+                
+
+                if(isDmg == 1){
+                    do{
+                    System.out.println("Cuantos utiles dañados hubo? ");
+                    cantDmg = sc.nextInt();
+                    cantidad = cantidad - cantDmg;
+                    }while(cantDmg > cantidad);
+                }
+
+
                 sc.nextLine();
 
-
                 if(tipo == 1){
-                    _arrUtiles[i] = new Util(nombre,_arrProveedores[idProveedor-1].get_Nombre(),restock, cantidad,null);
+                    _arrUtiles[i] = new Util(nombre,_arrProveedores[idProveedor-1].get_Nombre(),restock, cantidad,null,isDmg,cantDmg);
                 }
                 else{
                     
@@ -156,7 +192,7 @@ class UtilesOficina{
                     s_fecha = sc.nextLine();
                 
                     fecha = new SimpleDateFormat("dd/MM/yyyy").parse(s_fecha);
-                    _arrUtiles[i] = new Util(nombre,_arrProveedores[idProveedor-1].get_Nombre(),restock, cantidad,fecha);  
+                    _arrUtiles[i] = new Util(nombre,_arrProveedores[idProveedor-1].get_Nombre(),restock, cantidad,fecha,isDmg,cantDmg);  
 
                 }
                         
@@ -169,11 +205,59 @@ class UtilesOficina{
 
 
     private void set_arrProveedores(){
-        for(int i = 0; i< CANT_PROVEE;i++ ){
-            System.out.printf("Ingrese el siguiente valor[%d]: ",i+1);
+        for(int i = 0; i< CANT_PROVEE;i++){
+            System.out.printf("Ingrese el nombre del proveedor [%d]: ",i+1);
             _arrProveedores[i] = new Proveedor(sc.nextLine());
         }
     }
+
+    public void ListarReorden(){
+        System.out.println("Ariticulos a punto de reorden: ");
+        for(int i = 0; i< CANT_UTILES;i++ ){
+            if(_arrUtiles[i].get_Cantidad() <= _arrUtiles[i].get_Restock()){
+                System.out.printf("\nEl %s esta en punto de restock y tiene [%d]",_arrUtiles[i].get_Nombre(),_arrUtiles[i].get_Cantidad());
+            }
+        }
+    }
+
+    public void ListarProductosSinStock(){
+        System.out.println("Articulos sin stock: ");
+        for(int i = 0; i< CANT_UTILES;i++ ){
+        if(_arrUtiles[i].get_Cantidad() == 0){
+            System.out.printf("\nEl %s no tiene stock", _arrUtiles[i].get_Nombre());
+        }
+        
+        }
+    }
+
+    public void ListarProductosVencidos(){
+        System.out.println("Articulos vencidos: ");
+        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy"); 
+        Date fechaHoy = new Date();
+
+        for(int i = 0; i< CANT_UTILES;i++ ){
+            if(_arrUtiles[i].get_Fecha() != null){
+                if(_arrUtiles[i].get_Fecha().compareTo(fechaHoy) <= 0 ){
+                    System.out.printf("\nEl %s esta vencido, fecha:  %s",_arrUtiles[i].get_Nombre(),formato.format(_arrUtiles[i].get_Fecha()));
+                }
+            }
+            else{
+                continue;
+            }
+        }
+    }
+
+    public void ListarProductosDmg(){
+        System.out.println("Arituclos dañados: ");
+
+        for(int i = 0; i< CANT_UTILES;i++){
+            if(_arrUtiles[i].get_IsDmg() == 1){
+                System.out.printf("\nEl util %s tiene algunos dañados :c", _arrUtiles[i].get_Nombre());
+            }
+        }
+    }
+
+
 
 
     public void ImprimirProveedores(){
@@ -183,16 +267,37 @@ class UtilesOficina{
 
     }
 
+
     public void ImprimirArticulos(){
+        System.out.println("\n\t\t PRODUCTO\t| CANTIDAD\t| RESTOCK\t| PROVEEDOR");
         for(int i = 0; i< CANT_UTILES;i++ ){
-            
-            System.out.println(_arrUtiles[i].get_Nombre() + _arrUtiles[i].get_Cantidad() + _arrUtiles[i].get_Restock() + _arrUtiles[i].get_Proveedor());
-            
+            System.out.println("\n\t\t" + _arrUtiles[i].get_Nombre() +"\t\t|"+ _arrUtiles[i].get_Cantidad() +"\t\t|"+ _arrUtiles[i].get_Restock() +"\t\t|"+ _arrUtiles[i].get_Proveedor());
+
             if(_arrUtiles[i].get_Fecha() != null){
-                System.out.println(_arrUtiles[i].get_Fecha());
-            }   
+                System.out.println("\t\t\t\t Vencimiento:" + _arrUtiles[i].get_Fecha());
+            }
         }
 
+    }
+
+    public void ArticuloPorExistencia(){
+        System.out.println("\n\t\t NOMBRE DEL PRODUCTO \t |  CANTIDAD EXISTENTE");
+        for(int i = 0; i< CANT_UTILES;i++ ){
+            System.out.println("\t\t\t" +_arrUtiles[i].get_Nombre() + "\t\t | \t " + _arrUtiles[i].get_Cantidad());
+
+        }
+    }
+
+    public void ArticulosPorProveedor(){
+        for(int j=0; j<CANT_PROVEE; j++){
+            System.out.println("\nPROVEEDOR \t\t PRODUCTOS");
+            System.out.println(_arrProveedores[j].get_Nombre());
+            for(int i = 0; i< CANT_UTILES;i++ ){
+                if(_arrUtiles[i].get_Proveedor().equals(_arrProveedores[j].get_Nombre())){
+                    System.out.println("\t\t\t-"+_arrUtiles[i].get_Nombre());
+                }
+            }
+        }
     }
 
 
@@ -209,8 +314,13 @@ class UtilesOficina{
     public static void main(String[] args) {
 
         UtilesOficina utiles = new UtilesOficina();
-        utiles.ImprimirProveedores();
-        utiles.ImprimirArticulos();
+        /*utiles.ImprimirProveedores();
+        utiles.ImprimirArticulos();*/
+        utiles.ListarProductosVencidos();
+        utiles.ListarReorden();
+        utiles.ListarProductosSinStock();
+        utiles.ListarProductosDmg();
+
 
         
     }

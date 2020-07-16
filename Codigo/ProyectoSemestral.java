@@ -46,11 +46,12 @@ class Util{
 
     private int _cantVen = 0;
 
+    private int _tipo;
     private int _cantDmg;
     private int _isDmg;
     
 
-    public Util( String nombre, String proveedor, /*int codigo*/ int restock, int cantidad,Date fecha, int isDmg, int cantDmg){
+    public Util( String nombre, String proveedor, /*int codigo*/ int restock, int cantidad,Date fecha, int isDmg, int cantDmg,int tipo){
         this._nombre = nombre;
         this._proveedor = proveedor;
         this._restock = restock;
@@ -58,6 +59,7 @@ class Util{
         this._fecha = fecha;
         this._isDmg = isDmg;
         this._cantDmg = cantDmg;
+        this._tipo = tipo;
     }
 
     public String get_Nombre() {
@@ -102,9 +104,41 @@ class Util{
         _cant -= cantidad;
 
     }
+
+    public int get_tipo() {
+        return _tipo;
+    }
+
+    public void aum_cantDmg(int cantDmg){
+        _cantDmg += cantDmg;
+    }
+
+    public void aum_cantVen(int cantVen){
+        _cantVen += cantVen;
+    }
 }
 
 class Compra{
+
+    private int _idUtil;
+    private int _cantidad;
+    private int _cantDmg;
+    private Date _fechaVenc;
+
+
+    public Compra(int idUtil, int cantidad, int cantDmg, Date fechaVenc){
+        this._idUtil = idUtil;
+        this._cantidad = cantidad;
+        this._cantDmg = cantDmg;
+        this._fechaVenc = fechaVenc;
+
+    }
+
+    public int get_cantidad(){
+        return _cantidad;
+    }
+
+
 
 }
 
@@ -141,7 +175,7 @@ class UtilesOficina{
 
     private Util[] _arrUtiles = new Util[CANT_UTILES];
 
-    ArrayList<ArrayList<Integer>> _matCompras = new ArrayList<>(MAX_DIAS);
+    ArrayList<ArrayList<Compra>> _matCompras = new ArrayList<>(MAX_DIAS);
     ArrayList<ArrayList<Integer>> _matVentas = new ArrayList<>(MAX_DIAS);
     
 
@@ -209,26 +243,26 @@ class UtilesOficina{
                 
 
                 if(isDmg == 1){
-                    do{
+                    
                     System.out.println("Cuantos utiles dañados hubo? ");
                     cantDmg = sc.nextInt();
                     cantidad = cantidad - cantDmg;
-                    }while(cantDmg > cantidad);
+                    
                 }
 
 
-                sc.nextLine();
+                
 
                 if(tipo == 1){
-                    _arrUtiles[i] = new Util(nombre,_arrProveedores[idProveedor-1].get_Nombre(),restock, cantidad,null,isDmg,cantDmg);
+                    _arrUtiles[i] = new Util(nombre,_arrProveedores[idProveedor-1].get_Nombre(),restock, cantidad,null,isDmg,cantDmg,tipo);
                 }
-                else{
-                    
+                else if(tipo == 2){
+                    sc.nextLine();
                     System.out.println("Ingrese la fecha de vencimiento(dd/MM/yyyy)");
                     s_fecha = sc.nextLine();
                 
                     fecha = new SimpleDateFormat("dd/MM/yyyy").parse(s_fecha);
-                    _arrUtiles[i] = new Util(nombre,_arrProveedores[idProveedor-1].get_Nombre(),restock, cantidad,fecha,isDmg,cantDmg);  
+                    _arrUtiles[i] = new Util(nombre,_arrProveedores[idProveedor-1].get_Nombre(),restock, cantidad,fecha,isDmg,cantDmg,tipo);  
 
                 }
                         
@@ -339,24 +373,53 @@ class UtilesOficina{
 
     public int isDmg(int cantidad){
         int isDmg;
-        int cantDmg;
+        int cantDmg = 0;
         System.out.println("Hay algun articulo dañado?\n 1) Si 2) No");
         isDmg = sc.nextInt();                
         if(isDmg == 1){
             do{
             System.out.println("Cuantos utiles dañados hubo? ");
             cantDmg = sc.nextInt();
-            cantidad = cantidad - cantDmg;
             }while(cantDmg > cantidad);
         }
 
-        return cantidad;
+        return cantDmg;
     }
 
     public void comprar_Util(int idProducto, int cantCompra){
-        cantCompra = isDmg(cantCompra);
-        _arrUtiles[idProducto-1].comprar_Producto(cantCompra);        
-        _matCompras.get(idProducto-1).add(cantCompra);
+        int cantDmg = 0;
+        Date fecha = null;
+        String s_fecha;
+        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy"); 
+        Date fechaHoy = new Date();
+
+        idProducto = idProducto -1;
+
+        cantDmg = isDmg(cantCompra);
+
+        cantCompra = cantCompra - cantDmg;
+
+
+        if(_arrUtiles[idProducto].get_tipo()== 2){
+            sc.nextLine();
+            System.out.println("Ingrese la fecha de vencimiento(dd/MM/yyyy)");
+            s_fecha = sc.nextLine();
+            try{
+                fecha = new SimpleDateFormat("dd/MM/yyyy").parse(s_fecha);
+            }catch(ParseException e){
+                System.out.println("Forma de fecha incorrecto");
+            }
+
+            if(fecha.compareTo(fechaHoy) <= 0 ){
+                cantCompra = 0;
+            }
+
+            _arrUtiles[idProducto].aum_cantVen(cantCompra);
+        }
+
+        _arrUtiles[idProducto].comprar_Producto(cantCompra);
+        _arrUtiles[idProducto].aum_cantDmg(cantDmg);        
+        _matCompras.get(idProducto).add(new Compra(idProducto,cantCompra,cantDmg,fecha));
     }
 
 
@@ -366,7 +429,7 @@ class UtilesOficina{
         }
         else{
         _arrUtiles[idProducto-1].vender_Producto(cantVenta);
-        _matCompras.get(idProducto-1).add(cantVenta);
+        _matVentas.get(idProducto-1).add(cantVenta);
         }
     }
 
@@ -378,7 +441,7 @@ class UtilesOficina{
             for (int j = 0; j < edgeCount; j++) {
 
                 System.out.printf("Ventas de %s\n",_arrUtiles[i].get_Nombre());
-                System.out.printf("Venta[%d]: %f\n",j+1,_matVentas.get(i).get(j));
+                System.out.printf("Venta[%d]: %d\n",j+1,_matVentas.get(i).get(j));
                 cantidadTotal += _matVentas.get(i).get(j); 
             }
             System.out.printf("Total %d\n",cantidadTotal);
@@ -394,8 +457,8 @@ class UtilesOficina{
             for (int j = 0; j < edgeCount; j++) {
 
                 System.out.printf("Compras de %s\n",_arrUtiles[i].get_Nombre());
-                System.out.printf("Compra[%d]: %f\n",j+1,_matCompras.get(i).get(j));
-                cantidadTotal += _matCompras.get(i).get(j); 
+                System.out.printf("Compra[%d]: %d\n",j+1,_matCompras.get(i).get(j).get_cantidad());
+                cantidadTotal += _matCompras.get(i).get(j).get_cantidad(); 
             }
             System.out.printf("Total %d\n",cantidadTotal);
             
@@ -416,10 +479,21 @@ class UtilesOficina{
  public class ProyectoSemestral {
 
     public static void main(String[] args) {
+        int idProducto =1;
+        int cantCompra = 2;
+        int cantVenta = 1;
 
         UtilesOficina utiles = new UtilesOficina();
         /*utiles.ImprimirProveedores();
         utiles.ImprimirArticulos();*/
+
+
+        utiles.comprar_Util(idProducto, cantCompra);
+        utiles.vender_Util(idProducto, cantVenta);
+
+        utiles.imprimirVenta();
+        utiles.imprimirCompra();
+
         utiles.ListarProductosVencidos();
         utiles.ListarReorden();
         utiles.ListarProductosSinStock();

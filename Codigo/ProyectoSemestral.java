@@ -1,6 +1,4 @@
 package Codigo;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -22,11 +20,6 @@ import java.util.*;
 
         UtilesOficina utiles = new UtilesOficina();
         
-        
-        /*utiles.ImprimirProveedores();
-        utiles.ImprimirArticulos();*/
-
-
 
         utiles.comprar_Util(idProducto, cantCompra,dia);
         utiles.vender_Util(idProducto, cantVenta,dia);
@@ -41,17 +34,3 @@ import java.util.*;
         
     }
 }
-
-/*abstract
-Nombre1
-Nombre2
-Util1
-10
-20
-1
-Util2
-10
-20
-
-
-*/

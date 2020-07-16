@@ -1,1 +1,6 @@
+dist: xenial
+os: windows
 language: java
+java:
+  -14.0.1
+  

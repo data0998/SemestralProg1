@@ -118,24 +118,53 @@ class Util{
     }
 }
 
+class Venta{
+    private int _idUtil;
+    private int _cantVenta;
+    private int _diaVenta;
+
+
+    public Venta(int idUtil, int cantVenta,int diaVenta){
+        this._idUtil = idUtil;
+        this._cantVenta = cantVenta;
+        this._diaVenta = diaVenta;
+
+    }
+
+    public int get_cantVenta(){
+        return _cantVenta;
+    }
+
+    public int get_diaVenta(){
+        return _diaVenta;
+    }
+
+}
+
 class Compra{
 
     private int _idUtil;
     private int _cantidad;
+    private int _diaCompra;
     private int _cantDmg;
     private Date _fechaVenc;
 
 
-    public Compra(int idUtil, int cantidad, int cantDmg, Date fechaVenc){
+    public Compra(int idUtil, int cantidad, int cantDmg, Date fechaVenc,int diaCompra){
         this._idUtil = idUtil;
         this._cantidad = cantidad;
         this._cantDmg = cantDmg;
         this._fechaVenc = fechaVenc;
+        this._diaCompra = diaCompra;
 
     }
 
     public int get_cantidad(){
         return _cantidad;
+    }
+
+    public int get_diaCompra(){
+        return _diaCompra;
     }
 
 
@@ -176,7 +205,7 @@ class UtilesOficina{
     private Util[] _arrUtiles = new Util[CANT_UTILES];
 
     ArrayList<ArrayList<Compra>> _matCompras = new ArrayList<>(MAX_DIAS);
-    ArrayList<ArrayList<Integer>> _matVentas = new ArrayList<>(MAX_DIAS);
+    ArrayList<ArrayList<Venta>> _matVentas = new ArrayList<>(MAX_DIAS);
     
 
     public UtilesOficina(){
@@ -209,6 +238,7 @@ class UtilesOficina{
             String s_fecha;
             int tipo;
             Date fecha;
+            Date fechaHoy = new Date();
 
             int isDmg;
             int cantDmg = 0;
@@ -262,6 +292,12 @@ class UtilesOficina{
                     s_fecha = sc.nextLine();
                 
                     fecha = new SimpleDateFormat("dd/MM/yyyy").parse(s_fecha);
+                    
+                    if(fecha.compareTo(fechaHoy) <= 0 ){
+                        cantidad = 0;
+                        _arrUtiles[i].aum_cantVen(cantidad);
+                    }
+                    
                     _arrUtiles[i] = new Util(nombre,_arrProveedores[idProveedor-1].get_Nombre(),restock, cantidad,fecha,isDmg,cantDmg,tipo);  
 
                 }
@@ -386,7 +422,7 @@ class UtilesOficina{
         return cantDmg;
     }
 
-    public void comprar_Util(int idProducto, int cantCompra){
+    public void comprar_Util(int idProducto, int cantCompra,int diaCompra){
         int cantDmg = 0;
         Date fecha = null;
         String s_fecha;
@@ -419,17 +455,17 @@ class UtilesOficina{
 
         _arrUtiles[idProducto].comprar_Producto(cantCompra);
         _arrUtiles[idProducto].aum_cantDmg(cantDmg);        
-        _matCompras.get(idProducto).add(new Compra(idProducto,cantCompra,cantDmg,fecha));
+        _matCompras.get(idProducto).add(new Compra(idProducto,cantCompra,cantDmg,fecha,diaCompra));
     }
 
 
-    public void vender_Util(int idProducto, int cantVenta){
+    public void vender_Util(int idProducto, int cantVenta,int diaCompra){
         if(_arrUtiles[idProducto-1].get_Cantidad() < cantVenta){
             System.out.println("La cantidad a comprar supera el stock actual");
         }
         else{
         _arrUtiles[idProducto-1].vender_Producto(cantVenta);
-        _matVentas.get(idProducto-1).add(cantVenta);
+        _matVentas.get(idProducto-1).add(new Venta(idProducto,cantVenta,diaCompra));
         }
     }
 
@@ -441,8 +477,8 @@ class UtilesOficina{
             for (int j = 0; j < edgeCount; j++) {
 
                 System.out.printf("Ventas de %s\n",_arrUtiles[i].get_Nombre());
-                System.out.printf("Venta[%d]: %d\n",j+1,_matVentas.get(i).get(j));
-                cantidadTotal += _matVentas.get(i).get(j); 
+                System.out.printf("Venta[%d]: %d | Dia: %d \n",j+1,_matVentas.get(i).get(j).get_cantVenta(),_matVentas.get(i).get(j).get_diaVenta());
+                cantidadTotal += _matVentas.get(i).get(j).get_cantVenta(); 
             }
             System.out.printf("Total %d\n",cantidadTotal);
             
@@ -457,7 +493,7 @@ class UtilesOficina{
             for (int j = 0; j < edgeCount; j++) {
 
                 System.out.printf("Compras de %s\n",_arrUtiles[i].get_Nombre());
-                System.out.printf("Compra[%d]: %d\n",j+1,_matCompras.get(i).get(j).get_cantidad());
+                System.out.printf("Compra[%d]: %d | Dia: %d\n",j+1,_matCompras.get(i).get(j).get_cantidad(),_matCompras.get(i).get(j).get_diaCompra());
                 cantidadTotal += _matCompras.get(i).get(j).get_cantidad(); 
             }
             System.out.printf("Total %d\n",cantidadTotal);
@@ -479,17 +515,26 @@ class UtilesOficina{
  public class ProyectoSemestral {
 
     public static void main(String[] args) {
+
+        /* 
+        1: Hacer inventario fisico
+        2: Hacer compras y ventas por dias
+        3: Hacer las operaciones.
+            Hay que pensar bien como organizar las compras y ventas, si por dia o por producto.
+        
+        */
         int idProducto =1;
         int cantCompra = 2;
         int cantVenta = 1;
+        int dia = 1;
 
         UtilesOficina utiles = new UtilesOficina();
         /*utiles.ImprimirProveedores();
         utiles.ImprimirArticulos();*/
 
 
-        utiles.comprar_Util(idProducto, cantCompra);
-        utiles.vender_Util(idProducto, cantVenta);
+        utiles.comprar_Util(idProducto, cantCompra,dia);
+        utiles.vender_Util(idProducto, cantVenta,dia);
 
         utiles.imprimirVenta();
         utiles.imprimirCompra();
@@ -498,8 +543,6 @@ class UtilesOficina{
         utiles.ListarReorden();
         utiles.ListarProductosSinStock();
         utiles.ListarProductosDmg();
-
-
         
     }
 }

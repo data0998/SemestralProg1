@@ -6,6 +6,13 @@ import java.util.*;
  public class ProyectoSemestral {
     public static void main(String[] args) {
 
+        System.out.println("Bienvenido al comecio XYZ, porfavor siga las instrucciones al pie de la letra: ");
+        System.out.println("Ingrese los datos de los Proveedores");
+
+        UtilesOficina utiles = new UtilesOficina();
+
+        
+
         /* 
         1: Hacer inventario fisico
         2: Hacer compras y ventas por dias
@@ -18,7 +25,7 @@ import java.util.*;
         int cantVenta = 1;
         int dia = 1;
 
-        UtilesOficina utiles = new UtilesOficina();
+        
         
 
         utiles.comprar_Util(idProducto, cantCompra,dia);

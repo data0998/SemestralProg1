@@ -57,7 +57,7 @@ public class UtilesOficina{
             int cantDmg = 0;
 
             for(int i = 0; i< CANT_UTILES;i++){
-                System.out.printf("Ingrese los siguientes datos del util [%d]",  (i+1));
+                System.out.printf("\nAhora, ingrese la información de los utiles:\nIngrese los siguientes datos del util [%d]\n",  (i+1));
 
                 System.out.println("Seleccione el tipo de util:\n1) No Perecedero\n2) Perecedero");
                 tipo = sc.nextInt();
@@ -70,9 +70,6 @@ public class UtilesOficina{
                 ImprimirProveedores();
                 System.out.printf("Num. Proveedor: ");
                 idProveedor = sc.nextInt();
-
-                /*System.out.println("Ingrese el Codigo del Producto:");
-                codigo = sc.nextInt();*/
 
                 System.out.println("Ingrese el punto de reorden para " + nombre + ":");
                 restock = sc.nextInt();

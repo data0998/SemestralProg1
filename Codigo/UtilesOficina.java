@@ -10,6 +10,7 @@ public class UtilesOficina{
 
     public static int CANT_PROVEE = 2;
     public static int CANT_UTILES = 2;
+    public static int CANT_DIAS = 2;
 
     private static int MAX_DIAS = 5;
 
@@ -22,8 +23,6 @@ public class UtilesOficina{
     
 
     public UtilesOficina(){
-        this.set_arrProveedores();
-        this.set_arrUtiles();
         this.set_matCompras();
         this.set_matVentas();
 
@@ -42,7 +41,7 @@ public class UtilesOficina{
     }
     
     
-    private void set_arrUtiles(){
+    public void set_arrUtiles(){
         try{
             int idProveedor;
             String nombre;
@@ -120,14 +119,14 @@ public class UtilesOficina{
 
 
 
-    private void set_arrProveedores(){
+    public void set_arrProveedores(){
         for(int i = 0; i< CANT_PROVEE;i++){
             System.out.printf("Ingrese el nombre del proveedor [%d]: ",i+1);
             _arrProveedores[i] = new Proveedor(sc.nextLine());
         }
     }
 
-    public void ListarReorden(){
+    public void ArticulosPorReorden(){
         System.out.println("Ariticulos a punto de reorden: ");
         for(int i = 0; i< CANT_UTILES;i++ ){
             if(_arrUtiles[i].get_Cantidad() <= _arrUtiles[i].get_Restock()){
@@ -136,7 +135,7 @@ public class UtilesOficina{
         }
     }
 
-    public void ListarProductosSinStock(){
+    public void ArticulosSinStock(){
         System.out.println("Articulos sin stock: ");
         for(int i = 0; i< CANT_UTILES;i++ ){
         if(_arrUtiles[i].get_Cantidad() == 0){
@@ -146,7 +145,7 @@ public class UtilesOficina{
         }
     }
 
-    public void ListarProductosVencidos(){
+    public void ArticulosVencidos(){
         System.out.println("Articulos vencidos: ");
         SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy"); 
         Date fechaHoy = new Date();
@@ -163,7 +162,7 @@ public class UtilesOficina{
         }
     }
 
-    public void ListarProductosDmg(){
+    public void ArticulosDmg(){
         System.out.println("Arituclos dañados: ");
 
         for(int i = 0; i< CANT_UTILES;i++){

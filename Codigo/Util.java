@@ -43,7 +43,7 @@ public class Util {
         return _cant;
     }
 
-        public Date get_Fecha(){
+    public Date get_Fecha(){
         return _fecha;
     }
 

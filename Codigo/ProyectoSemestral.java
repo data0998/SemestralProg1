@@ -5,6 +5,13 @@ import java.util.*;
 
  public class ProyectoSemestral {
 
+    private void CompraVenta(){
+
+
+
+
+    }
+
     
      
     public static void main(String[] args) {
@@ -22,6 +29,8 @@ import java.util.*;
 /* 1) Hacer el inventario Fisico*/
         utiles.set_arrProveedores();
         utiles.set_arrUtiles();
+
+        utiles.VenceProximoMes();
 
  /*2) Hacer compra y venta*/
         do{
@@ -54,7 +63,7 @@ import java.util.*;
             else{
                 System.out.println("Opcion Incorrecta");
             }
-            }while(opcion != 0);
+        }while(opcion != 0);
 
  /*3) Hacer consultas*/
             do{
@@ -69,7 +78,7 @@ import java.util.*;
                     break;
 
                     case 2:
-                        /*Los articulos que se vencen en un mes*/
+                        utiles.VenceProximoMes();
                     break;
 
                     case 3:

@@ -311,13 +311,36 @@ public class UtilesOficina{
         }
     }
 
+    public void VenceProximoMes(){
+        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+        Date proxMes;
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.MONTH, 1);
+        proxMes = cal.getTime();
 
+        try{
+        proxMes = formato.parse(formato.format(proxMes));
+        }catch(ParseException e){
+            System.out.println("Forma de fecha incorrecto");
+        }
 
+        System.out.println(proxMes);
 
+        System.out.println(_arrUtiles[1].get_Fecha());
 
-    
+        for(int i = 0; i < CANT_UTILES; i++){
 
+            if(_arrUtiles[i].get_Fecha() == null){
+                continue;
+            }
 
+            if(_arrUtiles[i].get_Fecha().compareTo(proxMes) == 0){
+                System.out.printf("El util %s esta proximo a vencer con fecha de: ",_arrUtiles[i].get_Nombre());
+                System.out.println(_arrUtiles[i].get_Fecha());
 
+            }
+
+        }
+    }
 
 }

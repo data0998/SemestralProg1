@@ -4,21 +4,13 @@ import java.util.*;
 
 
  public class ProyectoSemestral {
-
-    private void CompraVenta(){
-
-
-
-
-    }
-
     
      
     public static void main(String[] args) {
 
         UtilesOficina utiles = new UtilesOficina();
         Scanner sc = new Scanner(System.in);
-        int dia = 1;
+        int dia = 7;
         int opcion,cantidad,idProducto;
 
         System.out.println("Bienvenido al comecio XYZ, porfavor siga las instrucciones al pie de la letra: ");
@@ -34,7 +26,7 @@ import java.util.*;
 
  /*2) Hacer compra y venta*/
         do{
-            System.out.println("Bienvenido al area de compra y venta de productos.\nPorfavor ingrese la opcion:\n1) Compra\n2) Venta\n3) Siguiente Dia\n0) Salir");
+            System.out.printf("\nBienvenido al area de compra y venta de productos del dia %d.\nPorfavor ingrese la opcion:\n1) Compra\n2) Venta\n3) Siguiente Dia\n0) Salir\n",dia);
             opcion = sc.nextInt();
 
             utiles.ImprimirArticulos();
@@ -61,7 +53,12 @@ import java.util.*;
                 dia++;
             }
             else{
-                System.out.println("Opcion Incorrecta");
+                System.out.println("Opcion Invalida");
+            }
+
+            if(dia > 7){
+                System.out.println("Ya han pasado los 7 dias c:");
+                break;
             }
         }while(opcion != 0);
 
@@ -107,6 +104,10 @@ import java.util.*;
 
                     case 9:
                         utiles.imprimirVenta();
+                    break;
+
+                    default:
+                        System.out.println("Opcion invalida");
                     break;
                 }
 
